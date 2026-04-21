@@ -39,7 +39,6 @@
         .bg-gradient-brand { background: linear-gradient(135deg, #ec4899, #3b82f6); }
         .text-gradient { background: linear-gradient(135deg, #ec4899, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Custom Scrollbar for Tables on Mobile */
         .overflow-x-auto { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
         
         #loadingOverlay {
@@ -53,13 +52,12 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" style="display: none;">
         <div class="spinner"></div>
         <p class="mt-4 text-brand-pink font-semibold">กำลังดำเนินการ...</p>
     </div>
 
-    <!-- Login Screen -->
+    <!-- หน้าจอล็อกอิน -->
     <div id="loginScreen" class="flex-grow flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
             <div class="bg-gradient-brand p-8 text-center">
@@ -88,7 +86,6 @@
                     </button>
                 </form>
 
-                <!-- Student Check Section -->
                 <div class="mt-8 border-t border-gray-100 pt-6 text-center">
                     <p class="text-sm text-gray-400 mb-4 font-medium uppercase tracking-wider">สำหรับนักเรียน</p>
                     <button type="button" onclick="openStudentCheckModal()" class="w-full bg-white border-2 border-brand-pink text-brand-pink font-bold py-2.5 px-4 rounded-xl hover:bg-pink-50 transition duration-200">
@@ -99,9 +96,8 @@
         </div>
     </div>
 
-    <!-- Main App Container -->
+    <!-- ส่วนเนื้อหาหลัก -->
     <div id="mainApp" class="hidden flex-col min-h-screen">
-        <!-- Navbar -->
         <nav class="bg-white shadow-sm sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
@@ -124,11 +120,9 @@
         </nav>
 
         <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            
-            <!-- Settings Bar (Admin) -->
             <div id="adminSettingsBar" class="hidden bg-white p-5 rounded-2xl shadow-sm mb-6 border border-gray-100 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div>
-                    <h3 class="font-bold text-gray-800 text-lg"><i class="fas fa-calendar-alt text-brand-pink mr-2"></i> ปีการศึกษาปัจจุปัน</h3>
+                    <h3 class="font-bold text-gray-800 text-lg"><i class="fas fa-calendar-alt text-brand-pink mr-2"></i> ปีการศึกษาปัจจุบัน</h3>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                     <select id="settingTerm" class="border rounded-xl px-4 py-2 text-sm flex-1 sm:flex-none outline-none focus:ring-2 focus:ring-brand-pink">
@@ -140,7 +134,6 @@
                 </div>
             </div>
 
-            <!-- Page Header -->
             <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ภาพรวมระบบ</h2>
@@ -159,7 +152,7 @@
                 </div>
             </div>
 
-            <!-- VIEW: Dashboard -->
+            <!-- หน้าแสดงผล Dashbaord -->
             <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-pink-500">
@@ -196,19 +189,18 @@
                                     <th class="px-6 py-4">ชื่อชุมนุม</th>
                                     <th class="px-6 py-4">ครูผู้สอน</th>
                                     <th class="px-6 py-4">กลุ่มสาระฯ</th>
+                                    <th class="px-6 py-4 text-center">สิทธิ์</th>
                                     <th class="px-6 py-4 text-center">จำนวน นร.</th>
                                     <th class="px-6 py-4 text-center">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody id="dashboardTableBody" class="text-sm text-gray-700 divide-y divide-gray-50">
-                                <!-- JS -->
-                            </tbody>
+                            <tbody id="dashboardTableBody" class="text-sm text-gray-700 divide-y divide-gray-50"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW: Manage (Admin Only) -->
+            <!-- หน้าจัดการ (Admin Only) -->
             <div id="view-manage" class="hidden space-y-8">
                 <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                     <h3 class="font-bold text-gray-800 text-lg mb-6 flex items-center"><i class="fas fa-plus-circle text-brand-blue mr-2"></i> เพิ่ม/แก้ไขข้อมูลชุมนุม</h3>
@@ -234,7 +226,14 @@
                             <label class="block text-xs font-bold text-gray-400 uppercase mb-2">กลุ่มสาระการเรียนรู้</label>
                             <input type="text" id="clubDept" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ระบุชื่อกลุ่มสาระฯ">
                         </div>
-                        <div class="flex items-end gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">สิทธิ์การใช้งาน</label>
+                            <select id="clubRole" class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition">
+                                <option value="teacher">ครูที่ปรึกษาทั่วไป</option>
+                                <option value="admin">ผู้ดูแลระบบ (Admin)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2 md:col-span-2 lg:col-span-3 mt-2">
                             <button type="submit" class="flex-grow bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-600 transition">
                                 <i class="fas fa-save mr-2"></i>บันทึกข้อมูล
                             </button>
@@ -245,7 +244,6 @@
                     </form>
                 </div>
 
-                <!-- Bulk Import -->
                 <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                     <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center"><i class="fas fa-file-import text-green-600 mr-2"></i> นำเข้าข้อมูลแบบชุด (Excel)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
@@ -260,13 +258,11 @@
                 </div>
             </div>
 
-            <!-- VIEW: Register -->
+            <!-- หน้าลงทะเบียน -->
             <div id="view-register" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-4">
                     <label class="font-black text-gray-700 whitespace-nowrap">ชุมนุมที่รับผิดชอบ:</label>
-                    <select id="regClubSelect" class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink font-bold text-brand-blue" onchange="renderStudentTable()">
-                        <!-- JS -->
-                    </select>
+                    <select id="regClubSelect" class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink font-bold text-brand-blue" onchange="renderStudentTable()"></select>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -306,9 +302,7 @@
                                         <th class="px-6 py-4 text-center">ลบ</th>
                                     </tr>
                                 </thead>
-                                <tbody id="studentTableBody" class="text-sm text-gray-700 divide-y divide-gray-50">
-                                    <!-- JS -->
-                                </tbody>
+                                <tbody id="studentTableBody" class="text-sm text-gray-700 divide-y divide-gray-50"></tbody>
                             </table>
                         </div>
                     </div>
@@ -316,7 +310,6 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="bg-gray-900 text-white py-10 mt-12 border-t-8 border-brand-pink">
             <div class="max-w-7xl mx-auto px-4 text-center space-y-4">
                 <p class="font-bold text-xl tracking-wide">โรงเรียนศรีวารินทร์</p>
@@ -330,24 +323,26 @@
         </footer>
     </div>
 
-    <!-- Firebase System -->
+    <!-- ระบบ Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIG (Replace with your actual Firebase config)
-        const firebaseConfig = {
-        apiKey: "AIzaSyCGLEJy-Nts-RA0AQYYNv-3_q4KXziyM5w",
-        authDomain: "regis-club.firebaseapp.com",
-        projectId: "regis-club",
-        storageBucket: "regis-club.firebasestorage.app",
-        messagingSenderId: "787495870075",
-        appId: "1:787495870075:web:a4ea59152fc9f81f968cde",
-        measurementId: "G-5TYCNCVG4E"
-      };
+        // *** สำคัญ: นำค่าจาก Firebase Console มาวางที่นี่ ***
+        const userFirebaseConfig = {
+            apiKey: "", 
+            authDomain: "regis-club.firebaseapp.com",
+            projectId: "regis-club",
+            storageBucket: "regis-club.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
 
-        const app_unique_id = 'regis-club';
+        // ตรวจสอบค่า Config จากระบบแวดล้อม หรือใช้ค่าที่ผู้ใช้กรอก
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
+        const app_unique_id = typeof __app_id !== 'undefined' ? __app_id : 'regis-club';
+        
         let app, auth, db, currentUser;
 
         window.appState = {
@@ -361,66 +356,79 @@
 
         const showLoading = (s) => document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none';
 
-        // Init Firebase
+        // ฟังก์ชันเริ่มระบบ Firebase
         async function init() {
-            if (!firebaseConfig.apiKey) {
-                console.warn("Firebase not configured yet. Running in demo mode.");
+            if (!firebaseConfig || !firebaseConfig.apiKey) {
+                Swal.fire({
+                    title: 'ยังไม่ได้ตั้งค่าฐานข้อมูล',
+                    text: 'กรุณากรอก apiKey ในส่วน Config ของโค้ดเพื่อให้ระบบทำงานได้',
+                    icon: 'warning'
+                });
                 return;
             }
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            
-            await signInAnonymously(auth);
-            onAuthStateChanged(auth, (user) => {
-                currentUser = user;
-                if(user) startSync();
-            });
+
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // ตรวจสอบการเข้าสู่ระบบ Firebase เบื้องต้น
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if(user) startSync();
+                });
+            } catch (error) {
+                console.error("Firebase Init Error:", error);
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้: ' + error.message, 'error');
+            }
         }
 
         function startSync() {
+            if (!db) return;
             const root = `/artifacts/${app_unique_id}/public/data`;
             
-            // Listen Settings
             onSnapshot(collection(db, root, 'settings'), (snap) => {
                 if(!snap.empty) {
                     const data = snap.docs[0].data();
                     window.appState.settings = { id: snap.docs[0].id, ...data };
-                    document.getElementById('displayYear').innerText = data.year;
-                    document.getElementById('displayTerm').innerText = data.term;
+                    document.getElementById('displayYear').innerText = data.year || '-';
+                    document.getElementById('displayTerm').innerText = data.term || '-';
                 }
-            });
+            }, (err) => console.error("Sync Settings Error:", err));
 
-            // Listen Clubs
             onSnapshot(collection(db, root, 'clubs'), (snap) => {
                 window.appState.clubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 updateClubsUI();
-            });
+            }, (err) => console.error("Sync Clubs Error:", err));
 
-            // Listen Students
             onSnapshot(collection(db, root, 'students'), (snap) => {
                 window.appState.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderStudentTable();
                 renderDashboardTable();
-            });
+            }, (err) => console.error("Sync Students Error:", err));
         }
 
-        // --- Logic ---
+        // --- ระบบล็อกอินหน้าเว็บ ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pass = document.getElementById('loginPassword').value;
             
             showLoading(true);
-            
-            // Admin Hardcode Check
             if(email === 'admin@sriwarin.ac.th' && pass === '123456') {
                 loginSuccess(email, 'admin', 'ผู้ดูแลระบบ');
             } else {
-                // Teacher Check
                 const club = window.appState.clubs.find(c => c.email === email && c.password === pass);
                 if(club) {
-                    loginSuccess(email, 'teacher', `ครู${club.teacher}`);
+                    const userRole = club.role === 'admin' ? 'admin' : 'teacher';
+                    const userName = club.role === 'admin' ? `แอดมิน (${club.teacher})` : `ครู${club.teacher}`;
+                    loginSuccess(email, userRole, userName);
                 } else {
                     Swal.fire('ล้มเหลว', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
                 }
@@ -443,6 +451,9 @@
             if(role === 'admin') {
                 document.getElementById('adminSettingsBar').classList.remove('hidden');
                 document.getElementById('tab-manage').classList.remove('hidden');
+            } else {
+                document.getElementById('adminSettingsBar').classList.add('hidden');
+                document.getElementById('tab-manage').classList.add('hidden');
             }
             
             window.switchTab('dashboard');
@@ -466,29 +477,32 @@
             document.getElementById(`view-${tab}`).classList.remove('hidden');
         };
 
-        // --- CRUD Operations ---
+        // --- ระบบบันทึกข้อมูล (Firestore) ---
         document.getElementById('clubForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) return Swal.fire('Error', 'ฐานข้อมูลยังไม่พร้อมใช้งาน กรุณาตรวจสอบ Config', 'error');
+
             const id = document.getElementById('clubId').value;
             const data = {
                 name: document.getElementById('clubName').value,
                 teacher: document.getElementById('clubTeacher').value,
                 email: document.getElementById('clubEmail').value.toLowerCase(),
                 password: document.getElementById('clubPassword').value,
-                dept: document.getElementById('clubDept').value
+                dept: document.getElementById('clubDept').value,
+                role: document.getElementById('clubRole').value
             };
             
             try {
                 showLoading(true);
-                const colRef = collection(db, `/artifacts/${app_unique_id}/public/data`, 'clubs');
+                const path = `/artifacts/${app_unique_id}/public/data`;
                 if(id) {
-                    await updateDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'clubs', id), data);
+                    await updateDoc(doc(db, path, 'clubs', id), data);
                 } else {
-                    await addDoc(colRef, data);
+                    await addDoc(collection(db, path, 'clubs'), data);
                 }
                 clearClubForm();
                 Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
-            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            } catch(e) { Swal.fire('ข้อผิดพลาด', e.message, 'error'); }
             finally { showLoading(false); }
         });
 
@@ -496,15 +510,17 @@
             const res = await Swal.fire({ title: 'ยืนยันการลบ?', text: 'ข้อมูลนักเรียนในชุมนุมจะหายไปด้วย', icon: 'warning', showCancelButton: true });
             if(res.isConfirmed) {
                 showLoading(true);
-                await deleteDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'clubs', id));
+                const path = `/artifacts/${app_unique_id}/public/data`;
+                await deleteDoc(doc(db, path, 'clubs', id));
                 const students = window.appState.students.filter(s => s.clubId === id);
-                for(let s of students) await deleteDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'students', s.id));
+                for(let s of students) await deleteDoc(doc(db, path, 'students', s.id));
                 showLoading(false);
             }
         };
 
         document.getElementById('studentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) return;
             const clubId = document.getElementById('regClubSelect').value;
             if(!clubId) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกชุมนุม', 'warning');
             
@@ -525,7 +541,7 @@
                 await addDoc(collection(db, `/artifacts/${app_unique_id}/public/data`, 'students'), data);
                 document.getElementById('studentForm').reset();
                 Swal.fire({ icon: 'success', title: 'ลงทะเบียนสำเร็จ', timer: 1000, showConfirmButton: false });
-            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            } catch(e) { Swal.fire('ข้อผิดพลาด', e.message, 'error'); }
             finally { showLoading(false); }
         });
 
@@ -534,32 +550,33 @@
             if(res.isConfirmed) await deleteDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'students', id));
         };
 
-        // --- Helpers ---
         function updateClubsUI() {
             const select = document.getElementById('regClubSelect');
+            if (!select) return;
             const role = window.appState.role;
             const email = window.appState.email;
-            
             const filterClubs = role === 'admin' ? window.appState.clubs : window.appState.clubs.filter(c => c.email === email);
-            
             select.innerHTML = filterClubs.map(c => `<option value="${c.id}">${c.name} (${c.teacher})</option>`).join('');
             renderDashboardTable();
             renderStudentTable();
         }
 
         window.renderDashboardTable = () => {
-            const filter = document.getElementById('filterInput').value.toLowerCase();
+            const filterInput = document.getElementById('filterInput');
+            if (!filterInput) return;
+            const filter = filterInput.value.toLowerCase();
             const tbody = document.getElementById('dashboardTableBody');
-            
             const list = window.appState.clubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
             
             tbody.innerHTML = list.map(c => {
                 const count = window.appState.students.filter(s => s.clubId === c.id).length;
+                const roleBadge = c.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-bold">แอดมิน</span>' : '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold">ครูทั่วไป</span>';
                 return `
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 font-bold whitespace-nowrap">${c.name}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${c.teacher}</td>
                         <td class="px-6 py-4 text-gray-500 whitespace-nowrap">${c.dept}</td>
+                        <td class="px-6 py-4 text-center whitespace-nowrap">${roleBadge}</td>
                         <td class="px-6 py-4 text-center"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg font-bold">${count}</span></td>
                         <td class="px-6 py-4 text-center whitespace-nowrap">
                             ${window.appState.role === 'admin' ? `
@@ -576,7 +593,9 @@
         };
 
         window.renderStudentTable = () => {
-            const clubId = document.getElementById('regClubSelect').value;
+            const select = document.getElementById('regClubSelect');
+            if (!select) return;
+            const clubId = select.value;
             const tbody = document.getElementById('studentTableBody');
             const list = window.appState.students.filter(s => s.clubId === clubId);
             
@@ -595,23 +614,26 @@
 
         window.editClub = (id) => {
             const c = window.appState.clubs.find(x => x.id === id);
+            if (!c) return;
             document.getElementById('clubId').value = c.id;
             document.getElementById('clubName').value = c.name;
             document.getElementById('clubTeacher').value = c.teacher;
             document.getElementById('clubEmail').value = c.email;
             document.getElementById('clubPassword').value = c.password;
             document.getElementById('clubDept').value = c.dept;
+            document.getElementById('clubRole').value = c.role || 'teacher';
             window.switchTab('manage');
         };
 
         window.clearClubForm = () => {
             document.getElementById('clubId').value = "";
             document.getElementById('clubForm').reset();
+            document.getElementById('clubRole').value = "teacher";
         };
 
-        // --- Excel Actions ---
         window.exportToExcel = () => {
-            const filter = document.getElementById('filterInput').value.toLowerCase();
+            const filterInput = document.getElementById('filterInput');
+            const filter = filterInput ? filterInput.value.toLowerCase() : '';
             const clubs = window.appState.clubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
             const clubIds = clubs.map(c => c.id);
             const students = window.appState.students.filter(s => clubIds.includes(s.clubId));
@@ -628,7 +650,7 @@
         };
 
         window.downloadTemplate = () => {
-            const data = [{"ชื่อชุมนุม": "ตัวอย่าง", "ชื่อ-นามสกุลครู": "ใจดี", "อีเมล": "test@sw.ac.th", "รหัสผ่าน": "123456", "กลุ่มสาระการเรียนรู้": "อิสลามศึกษา"}];
+            const data = [{"ชื่อชุมนุม": "ตัวอย่าง", "ชื่อ-นามสกุลครู": "ใจดี", "อีเมล": "test@sw.ac.th", "รหัสผ่าน": "123456", "กลุ่มสาระการเรียนรู้": "อิสลามศึกษา", "สิทธิ์(admin/teacher)": "teacher"}];
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Template");
@@ -637,22 +659,24 @@
 
         window.importExcel = async () => {
             const file = document.getElementById('excelUpload').files[0];
-            if(!file) return Swal.fire('!', 'เลือกไฟล์ก่อน', 'warning');
+            if(!file) return Swal.fire('!', 'กรุณาเลือกไฟล์ก่อน', 'warning');
             
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const workbook = XLSX.read(e.target.result, {type: 'array'});
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 showLoading(true);
+                const path = `/artifacts/${app_unique_id}/public/data`;
                 for(let r of json) {
                     if(r['ชื่อชุมนุม'] && r['อีเมล']) {
-                        await addDoc(collection(db, `/artifacts/${app_unique_id}/public/data`, 'clubs'), {
-                            name: r['ชื่อชุมนุม'], teacher: r['ชื่อ-นามสกุลครู'], email: r['อีเมล'].toLowerCase(), password: String(r['รหัสผ่าน']), dept: r['กลุ่มสาระการเรียนรู้']
+                        const role = r['สิทธิ์(admin/teacher)'] === 'admin' ? 'admin' : 'teacher';
+                        await addDoc(collection(db, path, 'clubs'), {
+                            name: r['ชื่อชุมนุม'], teacher: r['ชื่อ-นามสกุลครู'], email: r['อีเมล'].toLowerCase(), password: String(r['รหัสผ่าน']), dept: r['กลุ่มสาระการเรียนรู้'], role: role
                         });
                     }
                 }
                 showLoading(false);
-                Swal.fire('สำเร็จ', `นำเข้า ${json.length} รายการ`, 'success');
+                Swal.fire('สำเร็จ', `นำเข้าข้อมูลจำนวน ${json.length} รายการ`, 'success');
             };
             reader.readAsArrayBuffer(file);
         };
@@ -682,7 +706,7 @@
                             <p><b>ชื่อ:</b> ${st.name}</p>
                             <hr>
                             <p class="text-brand-pink"><b>ชุมนุม:</b> ${cl?.name || 'ไม่ทราบ'}</p>
-                            <p><b>ครู:</b> ${cl?.teacher || '-'}</p>
+                            <p><b>ครูที่ปรึกษา:</b> ${cl?.teacher || '-'}</p>
                             <p class="text-[10px] text-gray-400 mt-4 italic text-center">ลงทะเบียนเมื่อ: ${date}</p>
                         </div>`,
                         icon: 'success'
@@ -692,15 +716,18 @@
         };
 
         window.saveSettings = async () => {
+            if (!db) return;
             const data = { year: document.getElementById('settingYear').value, term: document.getElementById('settingTerm').value };
             showLoading(true);
-            const col = collection(db, `/artifacts/${app_unique_id}/public/data`, 'settings');
-            if(window.appState.settings.id) await updateDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'settings', window.appState.settings.id), data);
+            const path = `/artifacts/${app_unique_id}/public/data`;
+            const col = collection(db, path, 'settings');
+            if(window.appState.settings.id) await updateDoc(doc(db, path, 'settings', window.appState.settings.id), data);
             else await addDoc(col, data);
             showLoading(false);
             Swal.fire('สำเร็จ', 'บันทึกปีการศึกษาแล้ว', 'success');
         };
 
+        // เริ่มต้นการทำงาน
         init();
     </script>
 </body>
