@@ -645,6 +645,7 @@
                             <th class="p-3 border-b whitespace-nowrap">ปีการศึกษา-เทอม</th>
                             <th class="p-3 border-b whitespace-nowrap">รหัสนักเรียน</th>
                             <th class="p-3 border-b whitespace-nowrap">ชื่อ-นามสกุล</th>
+                            <th class="p-3 border-b whitespace-nowrap">ห้องเรียน</th>
                             <th class="p-3 border-b whitespace-nowrap">ชุมนุม</th>
                             <th class="p-3 border-b whitespace-nowrap">ครูที่ปรึกษา</th>
                         </tr>
@@ -652,7 +653,7 @@
                     <tbody class="text-sm text-gray-700 divide-y divide-gray-50">`;
 
             if(students.length === 0) {
-                html += `<tr><td colspan="5" class="p-6 text-center text-gray-500">ไม่มีข้อมูลนักเรียนลงทะเบียน</td></tr>`;
+                html += `<tr><td colspan="6" class="p-6 text-center text-gray-500">ไม่มีข้อมูลนักเรียนลงทะเบียน</td></tr>`;
             } else {
                 students.forEach(s => {
                     html += `
@@ -660,6 +661,7 @@
                         <td class="p-3 whitespace-nowrap">${year}-${term}</td>
                         <td class="p-3 font-mono whitespace-nowrap">${s.studentId}</td>
                         <td class="p-3 font-bold whitespace-nowrap">${s.name}</td>
+                        <td class="p-3 whitespace-nowrap">${s.classroom}</td>
                         <td class="p-3 whitespace-nowrap">${club.name}</td>
                         <td class="p-3 whitespace-nowrap">${club.teacher}</td>
                     </tr>`;
