@@ -156,7 +156,7 @@
             <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-pink-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">ชุมนุมทั้งหมด</p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">ชุมนุมทั้งหมด (ไม่นับซ้ำ)</p>
                         <p class="text-4xl font-black text-gray-800 mt-1" id="dashTotalClubs">0</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-blue-500">
@@ -542,8 +542,12 @@
                 registeredAt: new Date().toISOString()
             };
 
-            if(window.appState.students.some(s => s.studentId === data.studentId && s.clubId === clubId)) {
-                return Swal.fire('ซ้ำซ้อน', 'นักเรียนคนนี้ลงทะเบียนชุมนุมนี้แล้ว', 'warning');
+            // ตรวจสอบความซ้ำซ้อนในระบบ (1 คน สามารถลงได้แค่ 1 ชุมนุมเท่านั้น)
+            const existingStudent = window.appState.students.find(s => s.studentId === data.studentId);
+            if(existingStudent) {
+                const existingClub = window.appState.clubs.find(c => c.id === existingStudent.clubId);
+                const clubName = existingClub ? existingClub.name : 'ชุมนุมอื่น';
+                return Swal.fire('ซ้ำซ้อน', `นักเรียนรหัส ${data.studentId} ได้ลงทะเบียน "${clubName}" ไปแล้ว`, 'warning');
             }
 
             try {
@@ -590,6 +594,8 @@
                 const count = window.appState.students.filter(s => s.clubId === c.id).length;
                 totalStudentsCount += count;
                 const roleBadge = c.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-bold">แอดมิน</span>' : '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold">ครูทั่วไป</span>';
+                
+                // เพิ่มปุ่ม "ดูรายชื่อ" ให้ทุกคน และปุ่ม "แก้ไข/ลบ" เฉพาะแอดมิน
                 return `
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 font-bold whitespace-nowrap">${c.name}</td>
@@ -598,17 +604,72 @@
                         <td class="px-6 py-4 text-center whitespace-nowrap">${roleBadge}</td>
                         <td class="px-6 py-4 text-center"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg font-bold">${count}</span></td>
                         <td class="px-6 py-4 text-center whitespace-nowrap">
+                            <button onclick="viewClubStudents('${c.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg" title="ดูรายชื่อนักเรียน"><i class="fas fa-list"></i></button>
                             ${window.appState.role === 'admin' ? `
-                            <button onclick="editClub('${c.id}')" class="text-yellow-500 hover:bg-yellow-50 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteClub('${c.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
-                            ` : '-'}
+                            <button onclick="editClub('${c.id}')" class="text-yellow-500 hover:bg-yellow-50 p-2 rounded-lg" title="แก้ไข"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteClub('${c.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg" title="ลบ"><i class="fas fa-trash"></i></button>
+                            ` : ''}
                         </td>
                     </tr>
                 `;
             }).join('');
             
-            document.getElementById('dashTotalClubs').innerText = visibleClubs.length;
+            // นับจำนวนชุมนุมจากชื่อที่ไม่ซ้ำกัน
+            const uniqueClubsCount = new Set(visibleClubs.map(c => c.name.trim())).size;
+            
+            document.getElementById('dashTotalClubs').innerText = uniqueClubsCount;
             document.getElementById('dashTotalStudents').innerText = totalStudentsCount;
+        };
+
+        // ฟังก์ชันใหม่ สำหรับดูรายชื่อนักเรียนในแดชบอร์ด
+        window.viewClubStudents = (clubId) => {
+            const club = window.appState.clubs.find(c => c.id === clubId);
+            if (!club) return;
+            const students = window.appState.students.filter(s => s.clubId === clubId);
+            const year = window.appState.settings.year;
+            const term = window.appState.settings.term;
+
+            let html = `
+            <div class="overflow-x-auto mt-4">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-widest">
+                        <tr>
+                            <th class="p-3 border-b whitespace-nowrap">ปีการศึกษา-เทอม</th>
+                            <th class="p-3 border-b whitespace-nowrap">รหัสนักเรียน</th>
+                            <th class="p-3 border-b whitespace-nowrap">ชื่อ-นามสกุล</th>
+                            <th class="p-3 border-b whitespace-nowrap">ชุมนุม</th>
+                            <th class="p-3 border-b whitespace-nowrap">ครูที่ปรึกษา</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-gray-700 divide-y divide-gray-50">`;
+
+            if(students.length === 0) {
+                html += `<tr><td colspan="5" class="p-6 text-center text-gray-500">ไม่มีข้อมูลนักเรียนลงทะเบียน</td></tr>`;
+            } else {
+                students.forEach(s => {
+                    html += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 whitespace-nowrap">${year}-${term}</td>
+                        <td class="p-3 font-mono whitespace-nowrap">${s.studentId}</td>
+                        <td class="p-3 font-bold whitespace-nowrap">${s.name}</td>
+                        <td class="p-3 whitespace-nowrap">${club.name}</td>
+                        <td class="p-3 whitespace-nowrap">${club.teacher}</td>
+                    </tr>`;
+                });
+            }
+            
+            html += `</tbody></table></div>`;
+
+            Swal.fire({
+                title: `<div class="text-xl font-bold text-gray-800">รายชื่อนักเรียน: ${club.name}</div>`,
+                html: html,
+                width: '800px',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    container: 'font-kanit'
+                }
+            });
         };
 
         window.renderStudentTable = () => {
