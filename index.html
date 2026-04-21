@@ -250,7 +250,7 @@
                         <button onclick="downloadTemplate()" class="bg-green-50 text-green-600 border border-green-200 px-4 py-2.5 rounded-xl font-bold hover:bg-green-100 transition">
                             <i class="fas fa-download mr-2"></i> โหลดไฟล์แม่แบบ
                         </button>
-                        <input type="file" id="excelUpload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-dashed border-gray-300 p-1.5 rounded-xl">
+                        <input type="file" id="excelUpload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-dashed border-gray-300 p-1.5 rounded-xl">
                         <button onclick="importExcel()" class="bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-600 transition">
                             <i class="fas fa-cloud-upload-alt mr-2"></i> นำเข้าข้อมูลทันที
                         </button>
@@ -329,15 +329,15 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // *** สำคัญ: นำค่าจาก Firebase Console มาวางที่นี่ ***
-        const firebaseConfig = {
-          apiKey: "AIzaSyCGLEJy-Nts-RA0AQYYNv-3_q4KXziyM5w",
-          authDomain: "regis-club.firebaseapp.com",
-          projectId: "regis-club",
-          storageBucket: "regis-club.firebasestorage.app",
-          messagingSenderId: "787495870075",
-          appId: "1:787495870075:web:a4ea59152fc9f81f968cde",
-          measurementId: "G-5TYCNCVG4E"
+        // *** อัปเดตค่า Firebase Config เรียบร้อยแล้ว ***
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyCGLEJy-Nts-RA0AQYYNv-3_q4KXziyM5w",
+            authDomain: "regis-club.firebaseapp.com",
+            projectId: "regis-club",
+            storageBucket: "regis-club.firebasestorage.app",
+            messagingSenderId: "787495870075",
+            appId: "1:787495870075:web:a4ea59152fc9f81f968cde",
+            measurementId: "G-5TYCNCVG4E"
         };
 
         // ตรวจสอบค่า Config จากระบบแวดล้อม หรือใช้ค่าที่ผู้ใช้กรอก
@@ -470,12 +470,20 @@
         window.switchTab = (tab) => {
             ['dashboard', 'manage', 'register'].forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
-                if(btn) btn.className = "flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap";
+                if(btn) {
+                    btn.classList.remove('bg-brand-pink', 'text-white', 'shadow-lg');
+                    btn.classList.add('bg-white', 'text-gray-600', 'hover:bg-gray-50');
+                }
                 const view = document.getElementById(`view-${t}`);
                 if(view) view.classList.add('hidden');
             });
-            document.getElementById(`tab-${tab}`).className = "flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-brand-pink text-white shadow-lg whitespace-nowrap";
-            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-gray-600', 'hover:bg-gray-50');
+                activeBtn.classList.add('bg-brand-pink', 'text-white', 'shadow-lg');
+            }
+            const activeView = document.getElementById(`view-${tab}`);
+            if(activeView) activeView.classList.remove('hidden');
         };
 
         // --- ระบบบันทึกข้อมูล (Firestore) ---
@@ -567,10 +575,19 @@
             if (!filterInput) return;
             const filter = filterInput.value.toLowerCase();
             const tbody = document.getElementById('dashboardTableBody');
-            const list = window.appState.clubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
             
+            // กรองให้ครูทั่วไปเห็นเฉพาะชุมนุมตัวเองในหน้าแดชบอร์ด
+            let visibleClubs = window.appState.role === 'admin' 
+                ? window.appState.clubs 
+                : window.appState.clubs.filter(c => c.email === window.appState.email);
+
+            const list = visibleClubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
+            
+            let totalStudentsCount = 0;
+
             tbody.innerHTML = list.map(c => {
                 const count = window.appState.students.filter(s => s.clubId === c.id).length;
+                totalStudentsCount += count;
                 const roleBadge = c.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-bold">แอดมิน</span>' : '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold">ครูทั่วไป</span>';
                 return `
                     <tr class="hover:bg-gray-50 transition">
@@ -589,8 +606,8 @@
                 `;
             }).join('');
             
-            document.getElementById('dashTotalClubs').innerText = window.appState.clubs.length;
-            document.getElementById('dashTotalStudents').innerText = window.appState.students.length;
+            document.getElementById('dashTotalClubs').innerText = visibleClubs.length;
+            document.getElementById('dashTotalStudents').innerText = totalStudentsCount;
         };
 
         window.renderStudentTable = () => {
@@ -635,7 +652,13 @@
         window.exportToExcel = () => {
             const filterInput = document.getElementById('filterInput');
             const filter = filterInput ? filterInput.value.toLowerCase() : '';
-            const clubs = window.appState.clubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
+            
+            // กรองให้ดาวน์โหลด Excel ได้เฉพาะข้อมูลชุมนุมของตนเอง (ถ้าไม่ใช่แอดมิน)
+            let visibleClubs = window.appState.role === 'admin' 
+                ? window.appState.clubs 
+                : window.appState.clubs.filter(c => c.email === window.appState.email);
+
+            const clubs = visibleClubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
             const clubIds = clubs.map(c => c.id);
             const students = window.appState.students.filter(s => clubIds.includes(s.clubId));
 
