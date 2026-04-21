@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบลงทะเบียนชุมนุม - โรงเรียนศรีวารินทร์</title>
+
+    <!-- Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { kanit: ['Kanit', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            pink: '#ec4899',
+                            blue: '#3b82f6',
+                            dark: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icon & UI Libs -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; }
+        .bg-gradient-brand { background: linear-gradient(135deg, #ec4899, #3b82f6); }
+        .text-gradient { background: linear-gradient(135deg, #ec4899, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Custom Scrollbar for Tables on Mobile */
+        .overflow-x-auto { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+        
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #ec4899; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+        <p class="mt-4 text-brand-pink font-semibold">กำลังดำเนินการ...</p>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
+            <div class="bg-gradient-brand p-8 text-center">
+                <img src="https://img2.pic.in.th/logo-SW.png" alt="Logo" class="w-24 h-24 mx-auto bg-white rounded-full p-1 mb-4 object-contain shadow-lg">
+                <h2 class="text-2xl font-bold text-white">ระบบลงทะเบียนชุมนุม</h2>
+                <p class="text-white/90 text-sm">โรงเรียนศรีวารินทร์</p>
+            </div>
+            <div class="p-8">
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">อีเมลผู้ใช้งาน</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-envelope"></i></span>
+                            <input type="email" id="loginEmail" required class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-pink" placeholder="email@sriwarin.ac.th">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">รหัสผ่าน</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="loginPassword" required class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-pink" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-brand text-white font-bold py-3 px-4 rounded-xl hover:shadow-lg transition duration-200 mt-2">
+                        เข้าสู่ระบบ <i class="fas fa-sign-in-alt ml-1"></i>
+                    </button>
+                </form>
+
+                <!-- Student Check Section -->
+                <div class="mt-8 border-t border-gray-100 pt-6 text-center">
+                    <p class="text-sm text-gray-400 mb-4 font-medium uppercase tracking-wider">สำหรับนักเรียน</p>
+                    <button type="button" onclick="openStudentCheckModal()" class="w-full bg-white border-2 border-brand-pink text-brand-pink font-bold py-2.5 px-4 rounded-xl hover:bg-pink-50 transition duration-200">
+                        <i class="fas fa-search mr-1"></i> ตรวจสอบผลการลงทะเบียน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="mainApp" class="hidden flex-col min-h-screen">
+        <!-- Navbar -->
+        <nav class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <img src="https://img2.pic.in.th/logo-SW.png" alt="Logo" class="w-10 h-10 object-contain mr-3">
+                        <h1 class="text-xl font-bold text-gradient hidden sm:block">ศรีวารินทร์ | ระบบชุมนุม</h1>
+                        <h1 class="text-lg font-bold text-gradient sm:hidden">ระบบชุมนุม</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right hidden md:block">
+                            <p id="navUserName" class="text-sm font-semibold text-gray-800"></p>
+                            <span id="navRoleBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold uppercase"></span>
+                        </div>
+                        <button onclick="logout()" class="bg-red-50 text-red-500 hover:bg-red-100 p-2.5 rounded-xl transition">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            
+            <!-- Settings Bar (Admin) -->
+            <div id="adminSettingsBar" class="hidden bg-white p-5 rounded-2xl shadow-sm mb-6 border border-gray-100 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg"><i class="fas fa-calendar-alt text-brand-pink mr-2"></i> ปีการศึกษาปัจจุปัน</h3>
+                </div>
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <select id="settingTerm" class="border rounded-xl px-4 py-2 text-sm flex-1 sm:flex-none outline-none focus:ring-2 focus:ring-brand-pink">
+                        <option value="1">ภาคเรียนที่ 1</option>
+                        <option value="2">ภาคเรียนที่ 2</option>
+                    </select>
+                    <input type="number" id="settingYear" class="border rounded-xl px-4 py-2 w-full sm:w-28 text-sm flex-1 sm:flex-none outline-none focus:ring-2 focus:ring-brand-pink" placeholder="ปี พ.ศ.">
+                    <button onclick="saveSettings()" class="bg-brand-blue text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-blue-600 w-full sm:w-auto transition">บันทึก</button>
+                </div>
+            </div>
+
+            <!-- Page Header -->
+            <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ภาพรวมระบบ</h2>
+                    <p class="text-gray-500 mt-1">ปีการศึกษา <span id="displayYear" class="font-bold text-brand-pink">-</span> ภาคเรียนที่ <span id="displayTerm" class="font-bold text-brand-blue">-</span></p>
+                </div>
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-brand-pink text-white shadow-lg whitespace-nowrap">
+                        <i class="fas fa-chart-line mr-2"></i>แดชบอร์ด
+                    </button>
+                    <button onclick="switchTab('manage')" id="tab-manage" class="hidden flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap">
+                        <i class="fas fa-tools mr-2"></i>จัดการครู/ชุมนุม
+                    </button>
+                    <button onclick="switchTab('register')" id="tab-register" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap">
+                        <i class="fas fa-user-plus mr-2"></i>ลงทะเบียน
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW: Dashboard -->
+            <div id="view-dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-pink-500">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">ชุมนุมทั้งหมด</p>
+                        <p class="text-4xl font-black text-gray-800 mt-1" id="dashTotalClubs">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-blue-500">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">นักเรียนที่ลงแล้ว</p>
+                        <p class="text-4xl font-black text-gray-800 mt-1" id="dashTotalStudents">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-green-500 flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">ส่งออกข้อมูล</p>
+                            <p class="text-sm font-medium text-gray-600 mt-1">ไฟล์ Excel ตามที่กรอง</p>
+                        </div>
+                        <button onclick="exportToExcel()" class="bg-green-100 text-green-600 p-4 rounded-2xl hover:bg-green-200 transition">
+                            <i class="fas fa-file-excel text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-5 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50/50">
+                        <h3 class="font-bold text-gray-800">สรุปจำนวนการลงทะเบียนแยกชุมนุม</h3>
+                        <div class="relative w-full md:w-72">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="filterInput" onkeyup="renderDashboardTable()" placeholder="ค้นหาชุมนุม หรือ ครู..." class="w-full border rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-gray-400 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-4">ชื่อชุมนุม</th>
+                                    <th class="px-6 py-4">ครูผู้สอน</th>
+                                    <th class="px-6 py-4">กลุ่มสาระฯ</th>
+                                    <th class="px-6 py-4 text-center">จำนวน นร.</th>
+                                    <th class="px-6 py-4 text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardTableBody" class="text-sm text-gray-700 divide-y divide-gray-50">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Manage (Admin Only) -->
+            <div id="view-manage" class="hidden space-y-8">
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="font-bold text-gray-800 text-lg mb-6 flex items-center"><i class="fas fa-plus-circle text-brand-blue mr-2"></i> เพิ่ม/แก้ไขข้อมูลชุมนุม</h3>
+                    <form id="clubForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <input type="hidden" id="clubId">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">ชื่อชุมนุม</label>
+                            <input type="text" id="clubName" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ระบุชื่อชุมนุม">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">ชื่อ-นามสกุล ครู</label>
+                            <input type="text" id="clubTeacher" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ไม่ต้องมีคำนำหน้า">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">อีเมลครู (Login)</label>
+                            <input type="email" id="clubEmail" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="teacher@sriwarin.ac.th">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">รหัสผ่านสำหรับครู</label>
+                            <input type="text" id="clubPassword" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ตั้งรหัสอย่างน้อย 6 ตัว">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">กลุ่มสาระการเรียนรู้</label>
+                            <input type="text" id="clubDept" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ระบุชื่อกลุ่มสาระฯ">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="flex-grow bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-600 transition">
+                                <i class="fas fa-save mr-2"></i>บันทึกข้อมูล
+                            </button>
+                            <button type="button" onclick="clearClubForm()" class="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl hover:bg-gray-200 transition">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bulk Import -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center"><i class="fas fa-file-import text-green-600 mr-2"></i> นำเข้าข้อมูลแบบชุด (Excel)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                        <button onclick="downloadTemplate()" class="bg-green-50 text-green-600 border border-green-200 px-4 py-2.5 rounded-xl font-bold hover:bg-green-100 transition">
+                            <i class="fas fa-download mr-2"></i> โหลดไฟล์แม่แบบ
+                        </button>
+                        <input type="file" id="excelUpload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-dashed border-gray-300 p-1.5 rounded-xl">
+                        <button onclick="importExcel()" class="bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-600 transition">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> นำเข้าข้อมูลทันที
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Register -->
+            <div id="view-register" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-4">
+                    <label class="font-black text-gray-700 whitespace-nowrap">ชุมนุมที่รับผิดชอบ:</label>
+                    <select id="regClubSelect" class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink font-bold text-brand-blue" onchange="renderStudentTable()">
+                        <!-- JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 h-fit sticky top-24">
+                        <h3 class="font-bold text-gray-800 text-lg mb-6 border-b pb-4 text-gradient"><i class="fas fa-plus-circle mr-2"></i>ลงทะเบียนนักเรียน</h3>
+                        <form id="studentForm" class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">เลขประจำตัวนักเรียน</label>
+                                <input type="number" id="stuId" required class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink" placeholder="เช่น 12345">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">ชื่อ-นามสกุล</label>
+                                <input type="text" id="stuName" required class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink" placeholder="ระบุชื่อ-นามสกุลนักเรียน">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">ระดับชั้น/ห้องเรียน</label>
+                                <input type="text" id="stuClass" required placeholder="เช่น ม.1/1" class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink">
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-brand text-white font-black py-4 rounded-xl hover:shadow-xl transition transform active:scale-95 uppercase tracking-widest">
+                                ลงทะเบียนชุมนุม
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 lg:col-span-2">
+                        <div class="p-5 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">รายชื่อนักเรียนในชุมนุม</h3>
+                            <span class="text-xs bg-brand-pink text-white px-3 py-1 rounded-full font-bold shadow-sm" id="clubStudentCount">0 คน</span>
+                        </div>
+                        <div class="overflow-x-auto max-h-[600px]">
+                            <table class="w-full text-left">
+                                <thead class="sticky top-0 bg-white shadow-sm text-gray-400 text-[10px] uppercase tracking-widest z-10">
+                                    <tr>
+                                        <th class="px-6 py-4">รหัสนักเรียน</th>
+                                        <th class="px-6 py-4">ชื่อ-นามสกุล</th>
+                                        <th class="px-6 py-4">ห้องเรียน</th>
+                                        <th class="px-6 py-4 text-center">ลบ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentTableBody" class="text-sm text-gray-700 divide-y divide-gray-50">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-10 mt-12 border-t-8 border-brand-pink">
+            <div class="max-w-7xl mx-auto px-4 text-center space-y-4">
+                <p class="font-bold text-xl tracking-wide">โรงเรียนศรีวารินทร์</p>
+                <p class="text-gray-400 text-sm">สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานราธิวาส</p>
+                <div class="py-4 border-t border-gray-800 max-w-sm mx-auto flex flex-col items-center">
+                    <p class="text-brand-pink font-mono text-xs mb-3">&lt;\dev\&gt;</p>
+                    <p class="text-sm font-medium">อับดุลฮากิม อ๊ะหมะ</p>
+                    <a href="mailto:Abdulhakim.a@sriwarinschool.ac.th" class="text-blue-400 text-xs hover:underline mt-1">Abdulhakim.a@sriwarinschool.ac.th</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase System -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // CONFIG (Replace with your actual Firebase config)
+        const firebaseConfig = {
+        apiKey: "AIzaSyCGLEJy-Nts-RA0AQYYNv-3_q4KXziyM5w",
+        authDomain: "regis-club.firebaseapp.com",
+        projectId: "regis-club",
+        storageBucket: "regis-club.firebasestorage.app",
+        messagingSenderId: "787495870075",
+        appId: "1:787495870075:web:a4ea59152fc9f81f968cde",
+        measurementId: "G-5TYCNCVG4E"
+      };
+
+        const app_unique_id = 'regis-club';
+        let app, auth, db, currentUser;
+
+        window.appState = {
+            role: null,
+            email: null,
+            name: null,
+            clubs: [],
+            students: [],
+            settings: { year: 2567, term: 1 }
+        };
+
+        const showLoading = (s) => document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none';
+
+        // Init Firebase
+        async function init() {
+            if (!firebaseConfig.apiKey) {
+                console.warn("Firebase not configured yet. Running in demo mode.");
+                return;
+            }
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            await signInAnonymously(auth);
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if(user) startSync();
+            });
+        }
+
+        function startSync() {
+            const root = `/artifacts/${app_unique_id}/public/data`;
+            
+            // Listen Settings
+            onSnapshot(collection(db, root, 'settings'), (snap) => {
+                if(!snap.empty) {
+                    const data = snap.docs[0].data();
+                    window.appState.settings = { id: snap.docs[0].id, ...data };
+                    document.getElementById('displayYear').innerText = data.year;
+                    document.getElementById('displayTerm').innerText = data.term;
+                }
+            });
+
+            // Listen Clubs
+            onSnapshot(collection(db, root, 'clubs'), (snap) => {
+                window.appState.clubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateClubsUI();
+            });
+
+            // Listen Students
+            onSnapshot(collection(db, root, 'students'), (snap) => {
+                window.appState.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderStudentTable();
+                renderDashboardTable();
+            });
+        }
+
+        // --- Logic ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('loginPassword').value;
+            
+            showLoading(true);
+            
+            // Admin Hardcode Check
+            if(email === 'admin@sriwarin.ac.th' && pass === '123456') {
+                loginSuccess(email, 'admin', 'ผู้ดูแลระบบ');
+            } else {
+                // Teacher Check
+                const club = window.appState.clubs.find(c => c.email === email && c.password === pass);
+                if(club) {
+                    loginSuccess(email, 'teacher', `ครู${club.teacher}`);
+                } else {
+                    Swal.fire('ล้มเหลว', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
+                }
+            }
+            showLoading(false);
+        });
+
+        function loginSuccess(email, role, name) {
+            window.appState.role = role;
+            window.appState.email = email;
+            window.appState.name = name;
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('flex');
+            
+            document.getElementById('navUserName').innerText = name;
+            document.getElementById('navRoleBadge').innerText = role === 'admin' ? 'แอดมิน' : 'ครู';
+            
+            if(role === 'admin') {
+                document.getElementById('adminSettingsBar').classList.remove('hidden');
+                document.getElementById('tab-manage').classList.remove('hidden');
+            }
+            
+            window.switchTab('dashboard');
+            Swal.fire({ icon: 'success', title: 'ยินดีต้อนรับ', text: name, timer: 1500, showConfirmButton: false });
+        }
+
+        window.logout = () => {
+            Swal.fire({ title: 'ออกจากระบบ?', icon: 'question', showCancelButton: true, confirmButtonText: 'ตกลง' }).then(r => {
+                if(r.isConfirmed) window.location.reload();
+            });
+        };
+
+        window.switchTab = (tab) => {
+            ['dashboard', 'manage', 'register'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if(btn) btn.className = "flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap";
+                const view = document.getElementById(`view-${t}`);
+                if(view) view.classList.add('hidden');
+            });
+            document.getElementById(`tab-${tab}`).className = "flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition bg-brand-pink text-white shadow-lg whitespace-nowrap";
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+        };
+
+        // --- CRUD Operations ---
+        document.getElementById('clubForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('clubId').value;
+            const data = {
+                name: document.getElementById('clubName').value,
+                teacher: document.getElementById('clubTeacher').value,
+                email: document.getElementById('clubEmail').value.toLowerCase(),
+                password: document.getElementById('clubPassword').value,
+                dept: document.getElementById('clubDept').value
+            };
+            
+            try {
+                showLoading(true);
+                const colRef = collection(db, `/artifacts/${app_unique_id}/public/data`, 'clubs');
+                if(id) {
+                    await updateDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'clubs', id), data);
+                } else {
+                    await addDoc(colRef, data);
+                }
+                clearClubForm();
+                Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            finally { showLoading(false); }
+        });
+
+        window.deleteClub = async (id) => {
+            const res = await Swal.fire({ title: 'ยืนยันการลบ?', text: 'ข้อมูลนักเรียนในชุมนุมจะหายไปด้วย', icon: 'warning', showCancelButton: true });
+            if(res.isConfirmed) {
+                showLoading(true);
+                await deleteDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'clubs', id));
+                const students = window.appState.students.filter(s => s.clubId === id);
+                for(let s of students) await deleteDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'students', s.id));
+                showLoading(false);
+            }
+        };
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clubId = document.getElementById('regClubSelect').value;
+            if(!clubId) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกชุมนุม', 'warning');
+            
+            const data = {
+                clubId,
+                studentId: document.getElementById('stuId').value,
+                name: document.getElementById('stuName').value,
+                classroom: document.getElementById('stuClass').value,
+                registeredAt: new Date().toISOString()
+            };
+
+            if(window.appState.students.some(s => s.studentId === data.studentId && s.clubId === clubId)) {
+                return Swal.fire('ซ้ำซ้อน', 'นักเรียนคนนี้ลงทะเบียนชุมนุมนี้แล้ว', 'warning');
+            }
+
+            try {
+                showLoading(true);
+                await addDoc(collection(db, `/artifacts/${app_unique_id}/public/data`, 'students'), data);
+                document.getElementById('studentForm').reset();
+                Swal.fire({ icon: 'success', title: 'ลงทะเบียนสำเร็จ', timer: 1000, showConfirmButton: false });
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            finally { showLoading(false); }
+        });
+
+        window.deleteStudent = async (id) => {
+            const res = await Swal.fire({ title: 'ลบรายชื่อ?', icon: 'warning', showCancelButton: true });
+            if(res.isConfirmed) await deleteDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'students', id));
+        };
+
+        // --- Helpers ---
+        function updateClubsUI() {
+            const select = document.getElementById('regClubSelect');
+            const role = window.appState.role;
+            const email = window.appState.email;
+            
+            const filterClubs = role === 'admin' ? window.appState.clubs : window.appState.clubs.filter(c => c.email === email);
+            
+            select.innerHTML = filterClubs.map(c => `<option value="${c.id}">${c.name} (${c.teacher})</option>`).join('');
+            renderDashboardTable();
+            renderStudentTable();
+        }
+
+        window.renderDashboardTable = () => {
+            const filter = document.getElementById('filterInput').value.toLowerCase();
+            const tbody = document.getElementById('dashboardTableBody');
+            
+            const list = window.appState.clubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
+            
+            tbody.innerHTML = list.map(c => {
+                const count = window.appState.students.filter(s => s.clubId === c.id).length;
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-bold whitespace-nowrap">${c.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${c.teacher}</td>
+                        <td class="px-6 py-4 text-gray-500 whitespace-nowrap">${c.dept}</td>
+                        <td class="px-6 py-4 text-center"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg font-bold">${count}</span></td>
+                        <td class="px-6 py-4 text-center whitespace-nowrap">
+                            ${window.appState.role === 'admin' ? `
+                            <button onclick="editClub('${c.id}')" class="text-yellow-500 hover:bg-yellow-50 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteClub('${c.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
+                            ` : '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('dashTotalClubs').innerText = window.appState.clubs.length;
+            document.getElementById('dashTotalStudents').innerText = window.appState.students.length;
+        };
+
+        window.renderStudentTable = () => {
+            const clubId = document.getElementById('regClubSelect').value;
+            const tbody = document.getElementById('studentTableBody');
+            const list = window.appState.students.filter(s => s.clubId === clubId);
+            
+            tbody.innerHTML = list.map(s => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-mono whitespace-nowrap">${s.studentId}</td>
+                    <td class="px-6 py-4 font-bold whitespace-nowrap">${s.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${s.classroom}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteStudent('${s.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-times-circle"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('clubStudentCount').innerText = `${list.length} คน`;
+        };
+
+        window.editClub = (id) => {
+            const c = window.appState.clubs.find(x => x.id === id);
+            document.getElementById('clubId').value = c.id;
+            document.getElementById('clubName').value = c.name;
+            document.getElementById('clubTeacher').value = c.teacher;
+            document.getElementById('clubEmail').value = c.email;
+            document.getElementById('clubPassword').value = c.password;
+            document.getElementById('clubDept').value = c.dept;
+            window.switchTab('manage');
+        };
+
+        window.clearClubForm = () => {
+            document.getElementById('clubId').value = "";
+            document.getElementById('clubForm').reset();
+        };
+
+        // --- Excel Actions ---
+        window.exportToExcel = () => {
+            const filter = document.getElementById('filterInput').value.toLowerCase();
+            const clubs = window.appState.clubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
+            const clubIds = clubs.map(c => c.id);
+            const students = window.appState.students.filter(s => clubIds.includes(s.clubId));
+
+            const data = students.map(s => {
+                const c = window.appState.clubs.find(x => x.id === s.clubId);
+                return { "รหัสนักเรียน": s.studentId, "ชื่อ-สกุล": s.name, "ชั้น": s.classroom, "ชุมนุม": c?.name, "ครู": c?.teacher };
+            });
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "รายชื่อ");
+            XLSX.writeFile(wb, `ลงทะเบียนชุมนุม_${window.appState.settings.year}.xlsx`);
+        };
+
+        window.downloadTemplate = () => {
+            const data = [{"ชื่อชุมนุม": "ตัวอย่าง", "ชื่อ-นามสกุลครู": "ใจดี", "อีเมล": "test@sw.ac.th", "รหัสผ่าน": "123456", "กลุ่มสาระการเรียนรู้": "อิสลามศึกษา"}];
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "แม่แบบชุมนุม.xlsx");
+        };
+
+        window.importExcel = async () => {
+            const file = document.getElementById('excelUpload').files[0];
+            if(!file) return Swal.fire('!', 'เลือกไฟล์ก่อน', 'warning');
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const workbook = XLSX.read(e.target.result, {type: 'array'});
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                showLoading(true);
+                for(let r of json) {
+                    if(r['ชื่อชุมนุม'] && r['อีเมล']) {
+                        await addDoc(collection(db, `/artifacts/${app_unique_id}/public/data`, 'clubs'), {
+                            name: r['ชื่อชุมนุม'], teacher: r['ชื่อ-นามสกุลครู'], email: r['อีเมล'].toLowerCase(), password: String(r['รหัสผ่าน']), dept: r['กลุ่มสาระการเรียนรู้']
+                        });
+                    }
+                }
+                showLoading(false);
+                Swal.fire('สำเร็จ', `นำเข้า ${json.length} รายการ`, 'success');
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        window.openStudentCheckModal = () => {
+            Swal.fire({
+                title: 'ตรวจสอบการลงทะเบียน',
+                input: 'number',
+                inputLabel: 'รหัสประจำตัวนักเรียน',
+                confirmButtonText: 'ค้นหา',
+                showCancelButton: true,
+                confirmButtonColor: '#ec4899',
+                preConfirm: async (id) => {
+                    const st = window.appState.students.find(s => s.studentId === id);
+                    if(!st) { Swal.showValidationMessage('ไม่พบข้อมูลการลงทะเบียน'); return false; }
+                    const cl = window.appState.clubs.find(c => c.id === st.clubId);
+                    return { st, cl };
+                }
+            }).then(r => {
+                if(r.isConfirmed) {
+                    const {st, cl} = r.value;
+                    const date = new Date(st.registeredAt).toLocaleString('th-TH');
+                    Swal.fire({
+                        title: 'ผลการลงทะเบียน',
+                        html: `<div class="text-left p-4 bg-gray-50 rounded-xl space-y-2">
+                            <p><b>รหัส:</b> ${st.studentId}</p>
+                            <p><b>ชื่อ:</b> ${st.name}</p>
+                            <hr>
+                            <p class="text-brand-pink"><b>ชุมนุม:</b> ${cl?.name || 'ไม่ทราบ'}</p>
+                            <p><b>ครู:</b> ${cl?.teacher || '-'}</p>
+                            <p class="text-[10px] text-gray-400 mt-4 italic text-center">ลงทะเบียนเมื่อ: ${date}</p>
+                        </div>`,
+                        icon: 'success'
+                    });
+                }
+            });
+        };
+
+        window.saveSettings = async () => {
+            const data = { year: document.getElementById('settingYear').value, term: document.getElementById('settingTerm').value };
+            showLoading(true);
+            const col = collection(db, `/artifacts/${app_unique_id}/public/data`, 'settings');
+            if(window.appState.settings.id) await updateDoc(doc(db, `/artifacts/${app_unique_id}/public/data`, 'settings', window.appState.settings.id), data);
+            else await addDoc(col, data);
+            showLoading(false);
+            Swal.fire('สำเร็จ', 'บันทึกปีการศึกษาแล้ว', 'success');
+        };
+
+        init();
+    </script>
+</body>
+</html>
