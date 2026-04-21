@@ -78,7 +78,10 @@
                         <label class="block text-gray-700 text-sm font-semibold mb-1">รหัสผ่าน</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-lock"></i></span>
-                            <input type="password" id="loginPassword" required class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-pink" placeholder="••••••••">
+                            <input type="password" id="loginPassword" required class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-pink" placeholder="••••••••">
+                            <button type="button" onclick="togglePassword('loginPassword', 'loginEyeIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition">
+                                <i id="loginEyeIcon" class="fas fa-eye"></i>
+                            </button>
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-gradient-brand text-white font-bold py-3 px-4 rounded-xl hover:shadow-lg transition duration-200 mt-2">
@@ -103,8 +106,8 @@
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <img src="https://img2.pic.in.th/logo-SW.png" alt="Logo" class="w-10 h-10 object-contain mr-3">
-                        <h1 class="text-xl font-bold text-gradient hidden sm:block">SriwarinNext | ระบบลงทะเบียนชุมนุม</h1>
-                        <h1 class="text-lg font-bold text-gradient sm:hidden">ระบบลงทะเบียนชุมนุม</h1>
+                        <h1 class="text-xl font-bold text-gradient hidden sm:block">ศรีวารินทร์ | ระบบชุมนุม</h1>
+                        <h1 class="text-lg font-bold text-gradient sm:hidden">ระบบชุมนุม</h1>
                     </div>
                     <div class="flex items-center space-x-4">
                         <div class="text-right hidden md:block">
@@ -136,7 +139,7 @@
 
             <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ลงทะเบียนชุมนุม</h2>
+                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ภาพรวมระบบ</h2>
                     <p class="text-gray-500 mt-1">ปีการศึกษา <span id="displayYear" class="font-bold text-brand-pink">-</span> ภาคเรียนที่ <span id="displayTerm" class="font-bold text-brand-blue">-</span></p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -220,7 +223,12 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase mb-2">รหัสผ่านสำหรับครู</label>
-                            <input type="text" id="clubPassword" required class="w-full border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ตั้งรหัสอย่างน้อย 6 ตัว">
+                            <div class="relative">
+                                <input type="password" id="clubPassword" required class="w-full border rounded-xl px-4 py-2.5 pr-10 focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="ตั้งรหัสอย่างน้อย 6 ตัว">
+                                <button type="button" onclick="togglePassword('clubPassword', 'clubEyeIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition">
+                                    <i id="clubEyeIcon" class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase mb-2">กลุ่มสาระการเรียนรู้</label>
@@ -711,20 +719,67 @@
             document.getElementById('clubRole').value = "teacher";
         };
 
-        window.exportToExcel = () => {
+        // ฟังก์ชันใหม่สำหรับ เปิด/ปิด การมองเห็นรหัสผ่าน
+        window.togglePassword = (inputId, iconId) => {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        };
+
+        window.exportToExcel = async () => {
+            // เพิ่ม Popup ถามห้องเรียนที่ต้องการกรอง
+            const { value: classroomFilter } = await Swal.fire({
+                title: 'ดาวน์โหลดข้อมูล Excel',
+                input: 'text',
+                inputLabel: 'กรองตามห้องเรียน (เช่น ม.1/1)',
+                inputPlaceholder: 'เว้นว่างไว้ หากต้องการโหลดทั้งหมด',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-download"></i> ดาวน์โหลด',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#10b981',
+            });
+
+            // ถ้ายกเลิกการโหลดให้หยุดการทำงาน
+            if (classroomFilter === undefined) return;
+
             const filterInput = document.getElementById('filterInput');
             const filter = filterInput ? filterInput.value.toLowerCase() : '';
             
-            // กรองให้ดาวน์โหลด Excel ได้เฉพาะข้อมูลชุมนุมของตนเอง (ถ้าไม่ใช่แอดมิน)
-            let visibleClubs = window.appState.role === 'admin' 
-                ? window.appState.clubs 
-                : window.appState.clubs.filter(c => c.email === window.appState.email);
+            let clubsToExport = window.appState.clubs;
 
-            const clubs = visibleClubs.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
-            const clubIds = clubs.map(c => c.id);
-            const students = window.appState.students.filter(s => clubIds.includes(s.clubId));
+            // 1. กรองตามช่องค้นหา (ชื่อชุมนุม / ชื่อครู) ให้คงเดิม
+            if (filter.trim() !== '') {
+                clubsToExport = clubsToExport.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
+            }
+            
+            // 2. ตรวจสอบสิทธิ์
+            // หาก "ไม่ได้ระบุห้องเรียน" และ "ไม่ใช่แอดมิน" ให้โหลดได้เฉพาะชุมนุมตัวเองเท่านั้น
+            // แต่หาก "ระบุห้องเรียน" จะอนุญาตให้ครูที่ปรึกษาประจำชั้นโหลดรายชื่อเด็กห้องนั้นได้จากทุกชุมนุม
+            if (classroomFilter.trim() === '' && window.appState.role !== 'admin') {
+                clubsToExport = clubsToExport.filter(c => c.email === window.appState.email);
+            }
 
-            const data = students.map(s => {
+            const clubIds = clubsToExport.map(c => c.id);
+            let studentsToExport = window.appState.students.filter(s => clubIds.includes(s.clubId));
+
+            // 3. กรองตามห้องเรียนที่ระบุ
+            if (classroomFilter.trim() !== '') {
+                studentsToExport = studentsToExport.filter(s => s.classroom.toLowerCase().includes(classroomFilter.trim().toLowerCase()));
+            }
+
+            if (studentsToExport.length === 0) {
+                return Swal.fire('ไม่มีข้อมูล', 'ไม่พบข้อมูลนักเรียนในห้อง หรือชุมนุมที่ระบุ', 'info');
+            }
+
+            const data = studentsToExport.map(s => {
                 const c = window.appState.clubs.find(x => x.id === s.clubId);
                 return { "รหัสนักเรียน": s.studentId, "ชื่อ-สกุล": s.name, "ชั้น": s.classroom, "ชุมนุม": c?.name, "ครู": c?.teacher };
             });
@@ -732,7 +787,17 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "รายชื่อ");
-            XLSX.writeFile(wb, `ลงทะเบียนชุมนุม_${window.appState.settings.year}.xlsx`);
+
+            // ตั้งชื่อไฟล์ให้มีชื่อห้องติดมาด้วย (ถ้ามีการกรอง)
+            let fileName = `ลงทะเบียนชุมนุม_${window.appState.settings.year}`;
+            if (classroomFilter.trim() !== '') {
+                // เปลี่ยนเครื่องหมาย / เป็น - เพื่อไม่ให้เกิด Error ตอนบันทึกไฟล์
+                const safeRoomName = classroomFilter.trim().replace(/\//g, '-');
+                fileName += `_ห้อง${safeRoomName}`;
+            }
+            fileName += `.xlsx`;
+
+            XLSX.writeFile(wb, fileName);
         };
 
         window.downloadTemplate = () => {
