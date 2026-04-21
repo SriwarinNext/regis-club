@@ -458,6 +458,7 @@
             }
             
             window.switchTab('dashboard');
+            updateClubsUI(); // เพิ่มตรงนี้เพื่อให้อัปเดต Dropdown และข้อมูลทันทีหลังล็อกอิน
             Swal.fire({ icon: 'success', title: 'ยินดีต้อนรับ', text: name, timer: 1500, showConfirmButton: false });
         }
 
