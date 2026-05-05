@@ -65,7 +65,29 @@
                 <h2 class="text-2xl font-bold text-white">ระบบลงทะเบียนชุมนุม</h2>
                 <p class="text-white/90 text-sm">โรงเรียนศรีวารินทร์</p>
             </div>
-            <div class="p-8">
+            
+            <!-- ส่วนสำหรับนักเรียน (แสดงเป็นค่าเริ่มต้น) -->
+            <div class="p-8" id="studentActionSection">
+                <div class="text-center space-y-6">
+                    <div class="bg-pink-50 text-brand-pink p-4 rounded-xl border border-pink-100">
+                        <i class="fas fa-user-graduate text-3xl mb-2"></i>
+                        <p class="font-bold text-lg">สำหรับนักเรียน</p>
+                        <p class="text-sm opacity-80 mt-1">คลิกปุ่มด้านล่างเพื่อตรวจสอบผลการลงทะเบียนชุมนุมของตนเอง</p>
+                    </div>
+                    <button type="button" onclick="openStudentCheckModal()" class="w-full bg-gradient-brand text-white font-bold py-4 px-4 rounded-xl hover:shadow-lg transition duration-200 transform hover:-translate-y-1 text-lg">
+                        <i class="fas fa-search mr-2"></i> ตรวจสอบผลการลงทะเบียน
+                    </button>
+                </div>
+                
+                <div class="mt-8 border-t border-gray-100 pt-6 text-center">
+                    <button type="button" onclick="toggleLoginView()" class="text-sm text-gray-400 hover:text-brand-pink transition flex items-center justify-center mx-auto font-medium">
+                        <i class="fas fa-user-shield mr-2"></i> สำหรับครู / ผู้ดูแลระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- ส่วนล็อกอินของครู/แอดมิน (ซ่อนเป็นค่าเริ่มต้น) -->
+            <div class="p-8 hidden" id="teacherLoginSection">
                 <form id="loginForm" class="space-y-4">
                     <div>
                         <label class="block text-gray-700 text-sm font-semibold mb-1">อีเมลผู้ใช้งาน</label>
@@ -89,10 +111,9 @@
                     </button>
                 </form>
 
-                <div class="mt-8 border-t border-gray-100 pt-6 text-center">
-                    <p class="text-sm text-gray-400 mb-4 font-medium uppercase tracking-wider">สำหรับนักเรียน</p>
-                    <button type="button" onclick="openStudentCheckModal()" class="w-full bg-white border-2 border-brand-pink text-brand-pink font-bold py-2.5 px-4 rounded-xl hover:bg-pink-50 transition duration-200">
-                        <i class="fas fa-search mr-1"></i> ตรวจสอบผลการลงทะเบียน
+                <div class="mt-6 border-t border-gray-100 pt-4 text-center">
+                    <button type="button" onclick="toggleLoginView()" class="text-sm text-gray-400 hover:text-brand-pink transition flex items-center justify-center mx-auto font-medium">
+                        <i class="fas fa-arrow-left mr-1"></i> กลับไปหน้านักเรียน
                     </button>
                 </div>
             </div>
@@ -106,7 +127,7 @@
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <img src="https://img2.pic.in.th/logo-SW.png" alt="Logo" class="w-10 h-10 object-contain mr-3">
-                        <h1 class="text-xl font-bold text-gradient hidden sm:block">SriwarinNext | ระบบลงทะเบียนชุมนุม</h1>
+                        <h1 class="text-xl font-bold text-gradient hidden sm:block">SriwarinNext| ระบบลงทะเบียนชุมนุม</h1>
                         <h1 class="text-lg font-bold text-gradient sm:hidden">ระบบลงทะเบียนชุมนุม</h1>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -139,7 +160,7 @@
 
             <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ระบบลงทะเบียนชุมนุม</h2>
+                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ภาพรวมระบบ</h2>
                     <p class="text-gray-500 mt-1">ปีการศึกษา <span id="displayYear" class="font-bold text-brand-pink">-</span> ภาคเรียนที่ <span id="displayTerm" class="font-bold text-brand-blue">-</span></p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -163,7 +184,7 @@
                         <p class="text-4xl font-black text-gray-800 mt-1" id="dashTotalClubs">0</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-blue-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">นักเรียนที่ลงทะเบียนแล้ว</p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">นักเรียนที่ลงแล้ว</p>
                         <p class="text-4xl font-black text-gray-800 mt-1" id="dashTotalStudents">0</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-green-500 flex justify-between items-center">
@@ -307,7 +328,7 @@
                                         <th class="px-6 py-4">รหัสนักเรียน</th>
                                         <th class="px-6 py-4">ชื่อ-นามสกุล</th>
                                         <th class="px-6 py-4">ห้องเรียน</th>
-                                        <th class="px-6 py-4 text-center">ลบ</th>
+                                        <th class="px-6 py-4 text-center">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody id="studentTableBody" class="text-sm text-gray-700 divide-y divide-gray-50"></tbody>
@@ -318,15 +339,14 @@
             </div>
         </main>
 
-        <footer class="bg-gray-900 text-white py-10 mt-12 border-t-8 border-brand-pink">
-            <div class="max-w-7xl mx-auto px-4 text-center space-y-4">
-                <p class="font-bold text-xl tracking-wide">โรงเรียนศรีวารินทร์</p>
-                <p class="text-gray-400 text-sm">สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานราธิวาส</p>
-                <div class="py-4 border-t border-gray-800 max-w-sm mx-auto flex flex-col items-center">
-                    <p class="text-brand-pink font-mono text-xs mb-3">&lt;\dev\&gt;</p>
-                    <p class="text-sm font-medium">อับดุลฮากิม อ๊ะหมะ</p>
-                    <a href="mailto:Abdulhakim.a@sriwarinschool.ac.th" class="text-blue-400 text-xs hover:underline mt-1">Abdulhakim.a@sriwarinschool.ac.th</a>
+        <footer class="bg-[#f8fafc] py-8 mt-12">
+            <div class="max-w-7xl mx-auto px-4 text-center flex flex-col items-center space-y-2">
+                <div class="flex items-center text-[#9ca3af] font-medium mb-1 text-sm">
+                    <img src="https://img2.pic.in.th/logo-SW.png" alt="Logo" class="w-5 h-5 mr-2 opacity-40 grayscale">
+                    โรงเรียนศรีวารินทร์
                 </div>
+                <p class="text-[#9ca3af] text-sm">ระบบลงทะเบียนชุมนุม - สพม. นราธิวาส</p>
+                <p class="text-[#9ca3af] text-sm font-mono">&lt;\dev&gt; อับดุลฮากิม อ๊ะหมะ</p>
             </div>
         </footer>
     </div>
@@ -694,12 +714,61 @@
                     <td class="px-6 py-4 font-mono whitespace-nowrap">${s.studentId}</td>
                     <td class="px-6 py-4 font-bold whitespace-nowrap">${s.name}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${s.classroom}</td>
-                    <td class="px-6 py-4 text-center">
-                        <button onclick="deleteStudent('${s.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-times-circle"></i></button>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        <button onclick="editStudent('${s.id}')" class="text-yellow-500 hover:text-yellow-600 mr-3" title="แก้ไขข้อมูล"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteStudent('${s.id}')" class="text-red-400 hover:text-red-600" title="ลบรายชื่อ"><i class="fas fa-times-circle"></i></button>
                     </td>
                 </tr>
             `).join('');
             document.getElementById('clubStudentCount').innerText = `${list.length} คน`;
+        };
+
+        window.editStudent = async (id) => {
+            const student = window.appState.students.find(s => s.id === id);
+            if (!student) return;
+
+            const { value: formValues } = await Swal.fire({
+                title: 'แก้ไขข้อมูลนักเรียน',
+                html:
+                    `<div class="space-y-4 text-left mt-4">` +
+                    `<div><label class="text-xs font-bold text-gray-400 uppercase">รหัสนักเรียน</label><input id="swal-stuId" type="number" class="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-brand-pink outline-none" value="${student.studentId}"></div>` +
+                    `<div><label class="text-xs font-bold text-gray-400 uppercase">ชื่อ-นามสกุล</label><input id="swal-stuName" type="text" class="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-brand-pink outline-none" value="${student.name}"></div>` +
+                    `<div><label class="text-xs font-bold text-gray-400 uppercase">ห้องเรียน</label><input id="swal-stuClass" type="text" class="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-brand-pink outline-none" value="${student.classroom}"></div>` +
+                    `</div>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-save mr-1"></i> บันทึก',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#3b82f6',
+                preConfirm: () => {
+                    const newId = document.getElementById('swal-stuId').value;
+                    const newName = document.getElementById('swal-stuName').value;
+                    const newClass = document.getElementById('swal-stuClass').value;
+                    if(!newId || !newName || !newClass) {
+                        Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    }
+                    return { studentId: newId, name: newName, classroom: newClass };
+                }
+            });
+
+            if (formValues) {
+                // เช็คว่าแก้ไขรหัสประจำตัวไปซ้ำกับคนอื่นในระบบหรือไม่ (ยกเว้นไอดีตัวเอง)
+                const isDuplicate = window.appState.students.some(s => s.studentId === formValues.studentId && s.id !== id);
+                if (isDuplicate) {
+                    return Swal.fire('ซ้ำซ้อน', 'รหัสนักเรียนนี้มีในระบบแล้ว', 'error');
+                }
+
+                try {
+                    showLoading(true);
+                    const path = `/artifacts/${app_unique_id}/public/data`;
+                    await updateDoc(doc(db, path, 'students', id), formValues);
+                    Swal.fire({ icon: 'success', title: 'อัปเดตข้อมูลสำเร็จ', timer: 1000, showConfirmButton: false });
+                } catch (error) {
+                    Swal.fire('ข้อผิดพลาด', error.message, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
         };
 
         window.editClub = (id) => {
@@ -719,6 +788,19 @@
             document.getElementById('clubId').value = "";
             document.getElementById('clubForm').reset();
             document.getElementById('clubRole').value = "teacher";
+        };
+
+        window.toggleLoginView = () => {
+            const studentSection = document.getElementById('studentActionSection');
+            const teacherSection = document.getElementById('teacherLoginSection');
+            
+            if (studentSection.classList.contains('hidden')) {
+                studentSection.classList.remove('hidden');
+                teacherSection.classList.add('hidden');
+            } else {
+                studentSection.classList.add('hidden');
+                teacherSection.classList.remove('hidden');
+            }
         };
 
         // ฟังก์ชันใหม่สำหรับ เปิด/ปิด การมองเห็นรหัสผ่าน
