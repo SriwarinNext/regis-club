@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบลงทะเบียนชุมนุม - โรงเรียนศรีวารินทร์</title>
 
-    <!-- Fonts: Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -29,7 +27,6 @@
         }
     </script>
 
-    <!-- Icon & UI Libs -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -57,7 +54,6 @@
         <p class="mt-4 text-brand-pink font-semibold">กำลังดำเนินการ...</p>
     </div>
 
-    <!-- หน้าจอล็อกอิน -->
     <div id="loginScreen" class="flex-grow flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
             <div class="bg-gradient-brand p-8 text-center">
@@ -66,7 +62,6 @@
                 <p class="text-white/90 text-sm">โรงเรียนศรีวารินทร์</p>
             </div>
             
-            <!-- ส่วนสำหรับนักเรียน (แสดงเป็นค่าเริ่มต้น) -->
             <div class="p-8" id="studentActionSection">
                 <div class="text-center space-y-6">
                     <div class="bg-pink-50 text-brand-pink p-4 rounded-xl border border-pink-100">
@@ -86,7 +81,6 @@
                 </div>
             </div>
 
-            <!-- ส่วนล็อกอินของครู/แอดมิน (ซ่อนเป็นค่าเริ่มต้น) -->
             <div class="p-8 hidden" id="teacherLoginSection">
                 <form id="loginForm" class="space-y-4">
                     <div>
@@ -120,15 +114,14 @@
         </div>
     </div>
 
-    <!-- ส่วนเนื้อหาหลัก -->
     <div id="mainApp" class="hidden flex-col min-h-screen">
         <nav class="bg-white shadow-sm sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <img src="https://img2.pic.in.th/logo-SW.png" alt="Logo" class="w-10 h-10 object-contain mr-3">
-                        <h1 class="text-xl font-bold text-gradient hidden sm:block">SriwarinNext | ระบบลงทะเบียนชุมนุม</h1>
-                        <h1 class="text-lg font-bold text-gradient sm:hidden">ระบบลงทะเบียนชุมนุม</h1>
+                        <h1 class="text-xl font-bold text-gradient hidden sm:block">ศรีวารินทร์ | ระบบชุมนุม</h1>
+                        <h1 class="text-lg font-bold text-gradient sm:hidden">ระบบชุมนุม</h1>
                     </div>
                     <div class="flex items-center space-x-4">
                         <div class="text-right hidden md:block">
@@ -160,7 +153,7 @@
 
             <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ระบบลงทะเบียนชุมนุม</h2>
+                    <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">ภาพรวมระบบ</h2>
                     <p class="text-gray-500 mt-1">ปีการศึกษา <span id="displayYear" class="font-bold text-brand-pink">-</span> ภาคเรียนที่ <span id="displayTerm" class="font-bold text-brand-blue">-</span></p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -176,7 +169,6 @@
                 </div>
             </div>
 
-            <!-- หน้าแสดงผล Dashbaord -->
             <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-pink-500">
@@ -190,7 +182,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-green-500 flex justify-between items-center">
                         <div>
                             <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">ส่งออกข้อมูล</p>
-                            <p class="text-sm font-medium text-gray-600 mt-1">ไฟล์ Excel (โหลดเป็นห้อง/ประเภทชุมนุม)</p>
+                            <p class="text-sm font-medium text-gray-600 mt-1">ไฟล์ Excel ตามที่กรอง</p>
                         </div>
                         <button onclick="exportToExcel()" class="bg-green-100 text-green-600 p-4 rounded-2xl hover:bg-green-200 transition">
                             <i class="fas fa-file-excel text-2xl"></i>
@@ -224,7 +216,6 @@
                 </div>
             </div>
 
-            <!-- หน้าจัดการ (Admin Only) -->
             <div id="view-manage" class="hidden space-y-8">
                 <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                     <h3 class="font-bold text-gray-800 text-lg mb-6 flex items-center"><i class="fas fa-plus-circle text-brand-blue mr-2"></i> เพิ่ม/แก้ไขข้อมูลชุมนุม</h3>
@@ -274,20 +265,36 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                    <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center"><i class="fas fa-file-import text-green-600 mr-2"></i> นำเข้าข้อมูลแบบชุด (Excel)</h3>
+                    <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center"><i class="fas fa-file-import text-green-600 mr-2"></i> นำเข้าข้อมูลชุมนุมแบบชุด (Excel/CSV)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                         <button onclick="downloadTemplate()" class="bg-green-50 text-green-600 border border-green-200 px-4 py-2.5 rounded-xl font-bold hover:bg-green-100 transition">
                             <i class="fas fa-download mr-2"></i> โหลดไฟล์แม่แบบ
                         </button>
-                        <input type="file" id="excelUpload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-dashed border-gray-300 p-1.5 rounded-xl">
+                        <input type="file" id="excelUpload" accept=".csv, .xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-dashed border-gray-300 p-1.5 rounded-xl">
                         <button onclick="importExcel()" class="bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-600 transition">
-                            <i class="fas fa-cloud-upload-alt mr-2"></i> นำเข้าข้อมูลทันที
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> นำเข้าข้อมูลชุมนุม
                         </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mt-8">
+                    <h3 class="font-bold text-gray-800 text-lg mb-2 flex items-center"><i class="fas fa-users text-purple-600 mr-2"></i> นำเข้าฐานข้อมูลนักเรียน (Excel/CSV)</h3>
+                    <p class="text-xs text-gray-500 mb-4">สำหรับให้ระบบค้นหาชื่อและห้องเรียนอัตโนมัติเมื่อกรอกรหัสนักเรียน <a href="javascript:void(0)" onclick="downloadMasterStudentTemplate()" class="text-blue-500 underline hover:text-blue-700">โหลดไฟล์แม่แบบที่นี่</a></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        <input type="file" id="masterStudentUpload" accept=".csv, .xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 border border-dashed border-gray-300 p-1.5 rounded-xl">
+                        <button onclick="importMasterStudents()" class="bg-purple-600 text-white font-bold py-2.5 rounded-xl hover:bg-purple-700 transition">
+                            <i class="fas fa-database mr-2"></i> นำเข้าฐานข้อมูลนักเรียน
+                        </button>
+                    </div>
+                    <div class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
+                        <div class="text-sm text-gray-600">
+                            จำนวนนักเรียนในฐานข้อมูลปัจจุบัน: <span id="masterStudentCount" class="font-bold text-brand-pink text-lg bg-pink-50 px-3 py-1 rounded-lg border border-pink-100 shadow-sm ml-1">0</span> คน
+                        </div>
+                        <button onclick="clearMasterStudents()" class="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs transition font-bold"><i class="fas fa-trash-alt mr-1"></i> ล้างข้อมูลทั้งหมด</button>
                     </div>
                 </div>
             </div>
 
-            <!-- หน้าลงทะเบียน -->
             <div id="view-register" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-4">
                     <label class="font-black text-gray-700 whitespace-nowrap">ชุมนุมที่รับผิดชอบ:</label>
@@ -301,6 +308,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-2">เลขประจำตัวนักเรียน</label>
                                 <input type="number" id="stuId" required class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink" placeholder="เช่น 12345">
+                                <p id="autoFillMsg" class="text-[10px] text-green-600 mt-1 hidden"><i class="fas fa-check-circle"></i> พบข้อมูลในระบบ</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-2">ชื่อ-นามสกุล</label>
@@ -308,7 +316,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-2">ระดับชั้น/ห้องเรียน</label>
-                                <input type="text" id="stuClass" required placeholder="เช่น 1/1" class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink">
+                                <input type="text" id="stuClass" required placeholder="เช่น ม.1/1" class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-pink">
                             </div>
                             <button type="submit" class="w-full bg-gradient-brand text-white font-black py-4 rounded-xl hover:shadow-xl transition transform active:scale-95 uppercase tracking-widest">
                                 ลงทะเบียนชุมนุม
@@ -351,11 +359,10 @@
         </footer>
     </div>
 
-    <!-- ระบบ Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // *** อัปเดตค่า Firebase Config เรียบร้อยแล้ว ***
         const userFirebaseConfig = {
@@ -368,7 +375,6 @@
             measurementId: "G-5TYCNCVG4E"
         };
 
-        // ตรวจสอบค่า Config จากระบบแวดล้อม หรือใช้ค่าที่ผู้ใช้กรอก
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
         const app_unique_id = typeof __app_id !== 'undefined' ? __app_id : 'regis-club';
         
@@ -380,6 +386,7 @@
             name: null,
             clubs: [],
             students: [],
+            masterStudents: [], // ตัวแปรเก็บฐานข้อมูลนักเรียน
             settings: { year: 2567, term: 1 }
         };
 
@@ -401,7 +408,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // ตรวจสอบการเข้าสู่ระบบ Firebase เบื้องต้น
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -412,6 +418,28 @@
                     currentUser = user;
                     if(user) startSync();
                 });
+
+                // --- เพิ่มระบบ Auto-fill เมื่อพิมพ์รหัสนักเรียน ---
+                document.getElementById('stuId').addEventListener('input', (e) => {
+                    const stuId = e.target.value.trim();
+                    const msgEl = document.getElementById('autoFillMsg');
+                    const nameEl = document.getElementById('stuName');
+                    const classEl = document.getElementById('stuClass');
+
+                    if(stuId.length >= 4 && window.appState.masterStudents.length > 0) {
+                        const found = window.appState.masterStudents.find(s => s.studentId === stuId);
+                        if(found) {
+                            nameEl.value = found.name;
+                            classEl.value = found.classroom;
+                            msgEl.classList.remove('hidden');
+                        } else {
+                            msgEl.classList.add('hidden');
+                        }
+                    } else {
+                        msgEl.classList.add('hidden');
+                    }
+                });
+
             } catch (error) {
                 console.error("Firebase Init Error:", error);
                 Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้: ' + error.message, 'error');
@@ -441,6 +469,13 @@
                 renderStudentTable();
                 renderDashboardTable();
             }, (err) => console.error("Sync Students Error:", err));
+
+            // Sync ฐานข้อมูลนักเรียน (Master)
+            onSnapshot(collection(db, root, 'master_students'), (snap) => {
+                window.appState.masterStudents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const countEl = document.getElementById('masterStudentCount');
+                if (countEl) countEl.innerText = window.appState.masterStudents.length;
+            }, (err) => console.error("Sync Master Students Error:", err));
         }
 
         // --- ระบบล็อกอินหน้าเว็บ ---
@@ -486,7 +521,7 @@
             }
             
             window.switchTab('dashboard');
-            updateClubsUI(); // เพิ่มตรงนี้เพื่อให้อัปเดต Dropdown และข้อมูลทันทีหลังล็อกอิน
+            updateClubsUI();
             Swal.fire({ icon: 'success', title: 'ยินดีต้อนรับ', text: name, timer: 1500, showConfirmButton: false });
         }
 
@@ -570,7 +605,6 @@
                 registeredAt: new Date().toISOString()
             };
 
-            // ตรวจสอบความซ้ำซ้อนในระบบ (1 คน สามารถลงได้แค่ 1 ชุมนุมเท่านั้น)
             const existingStudent = window.appState.students.find(s => s.studentId === data.studentId);
             if(existingStudent) {
                 const existingClub = window.appState.clubs.find(c => c.id === existingStudent.clubId);
@@ -582,6 +616,7 @@
                 showLoading(true);
                 await addDoc(collection(db, `/artifacts/${app_unique_id}/public/data`, 'students'), data);
                 document.getElementById('studentForm').reset();
+                document.getElementById('autoFillMsg').classList.add('hidden'); // ซ่อนข้อความ
                 Swal.fire({ icon: 'success', title: 'ลงทะเบียนสำเร็จ', timer: 1000, showConfirmButton: false });
             } catch(e) { Swal.fire('ข้อผิดพลาด', e.message, 'error'); }
             finally { showLoading(false); }
@@ -609,7 +644,6 @@
             const filter = filterInput.value.toLowerCase();
             const tbody = document.getElementById('dashboardTableBody');
             
-            // กรองให้ครูทั่วไปเห็นเฉพาะชุมนุมตัวเองในหน้าแดชบอร์ด
             let visibleClubs = window.appState.role === 'admin' 
                 ? window.appState.clubs 
                 : window.appState.clubs.filter(c => c.email === window.appState.email);
@@ -623,7 +657,6 @@
                 totalStudentsCount += count;
                 const roleBadge = c.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-bold">แอดมิน</span>' : '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold">ครูทั่วไป</span>';
                 
-                // เพิ่มปุ่ม "ดูรายชื่อ" ให้ทุกคน และปุ่ม "แก้ไข/ลบ" เฉพาะแอดมิน
                 return `
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 font-bold whitespace-nowrap">${c.name}</td>
@@ -642,14 +675,12 @@
                 `;
             }).join('');
             
-            // นับจำนวนชุมนุมจากชื่อที่ไม่ซ้ำกัน
             const uniqueClubsCount = new Set(visibleClubs.map(c => c.name.trim())).size;
             
             document.getElementById('dashTotalClubs').innerText = uniqueClubsCount;
             document.getElementById('dashTotalStudents').innerText = totalStudentsCount;
         };
 
-        // ฟังก์ชันใหม่ สำหรับดูรายชื่อนักเรียนในแดชบอร์ด
         window.viewClubStudents = (clubId) => {
             const club = window.appState.clubs.find(c => c.id === clubId);
             if (!club) return;
@@ -696,9 +727,7 @@
                 width: '800px',
                 showCloseButton: true,
                 showConfirmButton: false,
-                customClass: {
-                    container: 'font-kanit'
-                }
+                customClass: { container: 'font-kanit' }
             });
         };
 
@@ -752,7 +781,6 @@
             });
 
             if (formValues) {
-                // เช็คว่าแก้ไขรหัสประจำตัวไปซ้ำกับคนอื่นในระบบหรือไม่ (ยกเว้นไอดีตัวเอง)
                 const isDuplicate = window.appState.students.some(s => s.studentId === formValues.studentId && s.id !== id);
                 if (isDuplicate) {
                     return Swal.fire('ซ้ำซ้อน', 'รหัสนักเรียนนี้มีในระบบแล้ว', 'error');
@@ -803,7 +831,6 @@
             }
         };
 
-        // ฟังก์ชันใหม่สำหรับ เปิด/ปิด การมองเห็นรหัสผ่าน
         window.togglePassword = (inputId, iconId) => {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
@@ -819,7 +846,6 @@
         };
 
         window.exportToExcel = async () => {
-            // เพิ่ม Popup ถามห้องเรียนที่ต้องการกรอง
             const { value: classroomFilter } = await Swal.fire({
                 title: 'ดาวน์โหลดข้อมูล Excel',
                 input: 'text',
@@ -831,7 +857,6 @@
                 confirmButtonColor: '#10b981',
             });
 
-            // ถ้ายกเลิกการโหลดให้หยุดการทำงาน
             if (classroomFilter === undefined) return;
 
             const filterInput = document.getElementById('filterInput');
@@ -839,14 +864,10 @@
             
             let clubsToExport = window.appState.clubs;
 
-            // 1. กรองตามช่องค้นหา (ชื่อชุมนุม / ชื่อครู) ให้คงเดิม
             if (filter.trim() !== '') {
                 clubsToExport = clubsToExport.filter(c => c.name.toLowerCase().includes(filter) || c.teacher.toLowerCase().includes(filter));
             }
             
-            // 2. ตรวจสอบสิทธิ์
-            // หาก "ไม่ได้ระบุห้องเรียน" และ "ไม่ใช่แอดมิน" ให้โหลดได้เฉพาะชุมนุมตัวเองเท่านั้น
-            // แต่หาก "ระบุห้องเรียน" จะอนุญาตให้ครูที่ปรึกษาประจำชั้นโหลดรายชื่อเด็กห้องนั้นได้จากทุกชุมนุม
             if (classroomFilter.trim() === '' && window.appState.role !== 'admin') {
                 clubsToExport = clubsToExport.filter(c => c.email === window.appState.email);
             }
@@ -854,7 +875,6 @@
             const clubIds = clubsToExport.map(c => c.id);
             let studentsToExport = window.appState.students.filter(s => clubIds.includes(s.clubId));
 
-            // 3. กรองตามห้องเรียนที่ระบุ
             if (classroomFilter.trim() !== '') {
                 studentsToExport = studentsToExport.filter(s => s.classroom.toLowerCase().includes(classroomFilter.trim().toLowerCase()));
             }
@@ -872,10 +892,8 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "รายชื่อ");
 
-            // ตั้งชื่อไฟล์ให้มีชื่อห้องติดมาด้วย (ถ้ามีการกรอง)
             let fileName = `ลงทะเบียนชุมนุม_${window.appState.settings.year}`;
             if (classroomFilter.trim() !== '') {
-                // เปลี่ยนเครื่องหมาย / เป็น - เพื่อไม่ให้เกิด Error ตอนบันทึกไฟล์
                 const safeRoomName = classroomFilter.trim().replace(/\//g, '-');
                 fileName += `_ห้อง${safeRoomName}`;
             }
@@ -884,6 +902,7 @@
             XLSX.writeFile(wb, fileName);
         };
 
+        // --- ระบบจัดการไฟล์แม่แบบและการนำเข้าข้อมูล ---
         window.downloadTemplate = () => {
             const data = [{"ชื่อชุมนุม": "ตัวอย่าง", "ชื่อ-นามสกุลครู": "ใจดี", "อีเมล": "test@sw.ac.th", "รหัสผ่าน": "123456", "กลุ่มสาระการเรียนรู้": "อิสลามศึกษา", "สิทธิ์(admin/teacher)": "teacher"}];
             const ws = XLSX.utils.json_to_sheet(data);
@@ -892,28 +911,118 @@
             XLSX.writeFile(wb, "แม่แบบชุมนุม.xlsx");
         };
 
+        window.downloadMasterStudentTemplate = () => {
+            const data = [{"รหัสนักเรียน": "12345", "ชื่อ-นามสกุล": "เด็กชายรักดี เรียนเก่ง", "ห้องเรียน": "ม.1/1"}];
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Students");
+            XLSX.writeFile(wb, "แม่แบบฐานข้อมูลนักเรียน.xlsx");
+        };
+
         window.importExcel = async () => {
             const file = document.getElementById('excelUpload').files[0];
             if(!file) return Swal.fire('!', 'กรุณาเลือกไฟล์ก่อน', 'warning');
             
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const workbook = XLSX.read(e.target.result, {type: 'array'});
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                showLoading(true);
-                const path = `/artifacts/${app_unique_id}/public/data`;
-                for(let r of json) {
-                    if(r['ชื่อชุมนุม'] && r['อีเมล']) {
-                        const role = r['สิทธิ์(admin/teacher)'] === 'admin' ? 'admin' : 'teacher';
-                        await addDoc(collection(db, path, 'clubs'), {
-                            name: r['ชื่อชุมนุม'], teacher: r['ชื่อ-นามสกุลครู'], email: r['อีเมล'].toLowerCase(), password: String(r['รหัสผ่าน']), dept: r['กลุ่มสาระการเรียนรู้'], role: role
-                        });
+                try {
+                    const workbook = XLSX.read(e.target.result, {type: 'array'});
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    showLoading(true);
+                    const path = `/artifacts/${app_unique_id}/public/data`;
+                    for(let r of json) {
+                        if(r['ชื่อชุมนุม'] && r['อีเมล']) {
+                            const role = r['สิทธิ์(admin/teacher)'] === 'admin' ? 'admin' : 'teacher';
+                            await addDoc(collection(db, path, 'clubs'), {
+                                name: r['ชื่อชุมนุม'], teacher: r['ชื่อ-นามสกุลครู'], email: r['อีเมล'].toLowerCase(), password: String(r['รหัสผ่าน']), dept: r['กลุ่มสาระการเรียนรู้'], role: role
+                            });
+                        }
                     }
-                }
-                showLoading(false);
-                Swal.fire('สำเร็จ', `นำเข้าข้อมูลจำนวน ${json.length} รายการ`, 'success');
+                    Swal.fire('สำเร็จ', `นำเข้าข้อมูลจำนวน ${json.length} รายการ`, 'success');
+                } catch(err) { Swal.fire('เกิดข้อผิดพลาด', err.message, 'error'); }
+                finally { showLoading(false); document.getElementById('excelUpload').value = ""; }
             };
             reader.readAsArrayBuffer(file);
+        };
+
+        window.importMasterStudents = async () => {
+            const file = document.getElementById('masterStudentUpload').files[0];
+            if(!file) return Swal.fire('!', 'กรุณาเลือกไฟล์ก่อน', 'warning');
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const workbook = XLSX.read(e.target.result, {type: 'array'});
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    showLoading(true);
+                    const path = `/artifacts/${app_unique_id}/public/data`;
+                    
+                    const chunks = [];
+                    let currentBatch = writeBatch(db);
+                    let currentCount = 0;
+                    let totalAdded = 0;
+
+                    for(let r of json) {
+                        if(r['รหัสนักเรียน'] && r['ชื่อ-นามสกุล']) {
+                            const docRef = doc(collection(db, path, 'master_students'));
+                            currentBatch.set(docRef, {
+                                studentId: String(r['รหัสนักเรียน']),
+                                name: r['ชื่อ-นามสกุล'],
+                                classroom: r['ห้องเรียน'] || ''
+                            });
+                            currentCount++;
+                            totalAdded++;
+
+                            if (currentCount >= 490) { // Firestore batch limit is 500
+                                chunks.push(currentBatch.commit());
+                                currentBatch = writeBatch(db);
+                                currentCount = 0;
+                            }
+                        }
+                    }
+
+                    if (currentCount > 0) chunks.push(currentBatch.commit());
+                    await Promise.all(chunks);
+
+                    if(totalAdded > 0) {
+                        Swal.fire('สำเร็จ', `นำเข้าข้อมูลนักเรียนทั้งหมด ${totalAdded} รายการ`, 'success');
+                    } else {
+                        Swal.fire('แจ้งเตือน', 'ไม่พบข้อมูลที่ถูกต้องในไฟล์ หรือรูปแบบคอลัมน์ไม่ตรงกับแม่แบบ', 'warning');
+                    }
+                } catch(err) { Swal.fire('เกิดข้อผิดพลาด', err.message, 'error'); }
+                finally { showLoading(false); document.getElementById('masterStudentUpload').value = ""; }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        window.clearMasterStudents = async () => {
+            const res = await Swal.fire({ title: 'ยืนยันการล้างข้อมูล?', text: 'ฐานข้อมูลนักเรียนทั้งหมดจะถูกลบ ไม่สามารถกู้คืนได้', icon: 'warning', showCancelButton: true });
+            if(res.isConfirmed) {
+                try {
+                    showLoading(true);
+                    const path = `/artifacts/${app_unique_id}/public/data`;
+                    const snap = await getDocs(collection(db, path, 'master_students'));
+                    
+                    const chunks = [];
+                    let currentBatch = writeBatch(db);
+                    let currentCount = 0;
+
+                    snap.docs.forEach(d => {
+                        currentBatch.delete(d.ref);
+                        currentCount++;
+                        if (currentCount >= 490) {
+                            chunks.push(currentBatch.commit());
+                            currentBatch = writeBatch(db);
+                            currentCount = 0;
+                        }
+                    });
+
+                    if (currentCount > 0) chunks.push(currentBatch.commit());
+                    await Promise.all(chunks);
+                    Swal.fire('สำเร็จ', 'ล้างข้อมูลฐานข้อมูลนักเรียนเรียบร้อยแล้ว', 'success');
+                } catch(err) { Swal.fire('ข้อผิดพลาด', err.message, 'error'); }
+                finally { showLoading(false); }
+            }
         };
 
         window.openStudentCheckModal = () => {
@@ -926,14 +1035,17 @@
                 confirmButtonColor: '#ec4899',
                 preConfirm: async (id) => {
                     const st = window.appState.students.find(s => s.studentId === id);
-                    if(!st) { Swal.showValidationMessage('ไม่พบข้อมูลการลงทะเบียน'); return false; }
+                    if(!st) { Swal.showValidationMessage('ไม่พบข้อมูลการลงทะเบียนชุมนุม'); return false; }
                     const cl = window.appState.clubs.find(c => c.id === st.clubId);
                     return { st, cl };
                 }
             }).then(r => {
                 if(r.isConfirmed) {
                     const {st, cl} = r.value;
-                    const date = new Date(st.registeredAt).toLocaleString('th-TH');
+                    const dateObj = new Date(st.registeredAt);
+                    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                    const dateStr = dateObj.toLocaleDateString('th-TH', options);
+
                     Swal.fire({
                         title: 'ผลการลงทะเบียน',
                         html: `<div class="text-left p-4 bg-gray-50 rounded-xl space-y-2">
@@ -942,7 +1054,7 @@
                             <hr>
                             <p class="text-brand-pink"><b>ชุมนุม:</b> ${cl?.name || 'ไม่ทราบ'}</p>
                             <p><b>ครูที่ปรึกษา:</b> ${cl?.teacher || '-'}</p>
-                            <p class="text-[10px] text-gray-400 mt-4 italic text-center">ลงทะเบียนเมื่อ: ${date}</p>
+                            <p class="text-[10px] text-gray-400 mt-4 italic text-center">ลงทะเบียนเมื่อ: ${dateStr} น.</p>
                         </div>`,
                         icon: 'success'
                     });
